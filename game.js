@@ -80,21 +80,38 @@ function movePlayer() {
     }
     function moveUp() {
         console.log("up");
-        playerPosition.y -= elementsSize;
-        startGame();
-    }
-    function moveRight() {
-        console.log("right");
-        playerPosition.x += elementsSize;
-        startGame();
+        if((playerPosition.y - elementsSize) < 0) {
+            console.log("You can't go up");
+        }else {
+            playerPosition.y -= elementsSize;
+            startGame();
+        }
     }
     function moveLeft() {
         console.log("left");
-        playerPosition.x -= elementsSize;
-        startGame();
+        if((playerPosition.x - elementsSize) < 40) {
+            console.log("You can't go left");
+        }else {
+            playerPosition.x -= elementsSize;
+            startGame();
+        }
+    }
+    function moveRight() {
+        console.log("right");
+        if((playerPosition.x + elementsSize) > 440) {
+            console.log("You can't go right");
+        }else {
+            playerPosition.x += elementsSize;
+            startGame();
+        }
     }
     function moveDown() {
         console.log("down");
-        playerPosition.y += elementsSize;
-        startGame();
+        if((playerPosition.y + elementsSize) > canvasSize) {
+            console.log("You can't go down");
+        }else {
+            playerPosition.y += elementsSize;
+            startGame();
+        }
     }
+
