@@ -7,6 +7,8 @@ const btnRight = document.querySelector("#right");
 
 let canvasSize;
 let elementsSize;
+let level = 0;
+let lives = 3;
 
 const playerPosition = { 
     x: 0, 
@@ -43,7 +45,11 @@ function startGame() {
     game.font = elementsSize + 'px Verdana';
     game.textAlign = "end";
 
-    const map = maps[0];
+    const map = maps[level];
+    if(!map) {
+        console.log("No hay mas niveles");
+        return;
+    }
     const mapRows = map.trim().split("\n");
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     console.log({map, mapRows, mapRowCols});
@@ -79,7 +85,7 @@ function movePlayer() {
     const giftCollision = giftCollisionX && giftCollisionY;
 
     if (giftCollision) {
-        console.log("Ganaste");
+        levelWin();
     }
 
     const enemyCollision = enemyPositions.find(enemy => {
@@ -88,11 +94,32 @@ function movePlayer() {
         return enemyCollisionX && enemyCollisionY;
     });
     if (enemyCollision) {
-        console.log("Perdiste");
+        levelfail();
     }
 
 
     game.fillText(emojis['PLAYER'], playerPosition.x, playerPosition.y);
+}
+
+function levelfail() {
+    if(lives > 0) {
+        lives--;
+        console.log("Perdiste una vida");
+    }else {
+        console.log("Perdiste");
+        lives = 3;
+        level = 0;
+    }
+    console.log("Vidas restantes: ", lives);
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
+    startGame();
+}
+
+function levelWin() {
+    console.log("Subiste de nivel");
+    level++;
+    startGame();
 }
 
     window.addEventListener("keydown", moveByKeys);
@@ -143,4 +170,3 @@ function movePlayer() {
             startGame();
         }
     }
-
