@@ -4,11 +4,19 @@ const btnUp = document.querySelector("#up");
 const btnDown = document.querySelector("#down");
 const btnLeft = document.querySelector("#left");
 const btnRight = document.querySelector("#right");
+const spanlives = document.querySelector("#lives");
+const spanTime = document.querySelector("#time");
+const spanRecord = document.querySelector("#record");
+const presult = document.querySelector("#result");
 
 let canvasSize;
 let elementsSize;
 let level = 0;
 let lives = 3;
+
+let timeStart;
+let timePlayer;
+let timeInterval;
 
 const playerPosition = { 
     x: 0, 
@@ -27,15 +35,17 @@ window.addEventListener("resize", setCanvasSize);
 
 function setCanvasSize() {
     if (window.innerHeight > window.innerWidth) {
-        canvasSize = window.innerWidth * 0.8;
+        canvasSize = window.innerWidth * 0.7;
     } else {
-        canvasSize = window.innerHeight * 0.8;
+        canvasSize = window.innerHeight * 0.7;
     }
     canvas.setAttribute("width", canvasSize);
     canvas.setAttribute("height", canvasSize);
 
     elementsSize = (canvasSize / 10);
     
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
     startGame();
 }
 
@@ -47,9 +57,17 @@ function startGame() {
 
     const map = maps[level];
     if(!map) {
+        gameWin();
         console.log("No hay mas niveles");
         return;
     }
+
+    if(!timeStart) {
+        timeStart = Date.now();
+        timeInterval = setInterval(showTime, 100);
+        showRecord();
+    }
+
     const mapRows = map.trim().split("\n");
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     console.log({map, mapRows, mapRowCols});
@@ -77,6 +95,7 @@ function startGame() {
         });
     });
     movePlayer();
+    showLives();
 }
 
 function movePlayer() {
@@ -102,6 +121,7 @@ function movePlayer() {
 }
 
 function levelfail() {
+
     if(lives > 0) {
         lives--;
         console.log("Perdiste una vida");
@@ -109,6 +129,7 @@ function levelfail() {
         console.log("Perdiste");
         lives = 3;
         level = 0;
+        timeStart = undefined;
     }
     console.log("Vidas restantes: ", lives);
     playerPosition.x = undefined;
@@ -120,6 +141,39 @@ function levelWin() {
     console.log("Subiste de nivel");
     level++;
     startGame();
+}
+
+function showLives() {
+    spanlives.innerHTML = emojis['HEARTH'].repeat(lives);
+}
+
+function gameWin() {
+    console.log("Ganaste");
+    clearInterval(timeInterval);
+
+    const recordTime = localStorage.getItem("record_time");
+    const playerTime = (Date.now() - timeStart)/1000;
+
+    if(recordTime) {
+        if(recordTime > playerTime) {
+            localStorage.setItem("record_time", playerTime);
+            presult.innerHTML = "Nuevo record";
+        }else{
+            presult.innerHTML = "Lo siento, no superaste el record";
+        }
+    }else {
+        localStorage.setItem("record_time", (Date.now() - timeStart)/1000);
+        presult.innerHTML = "Primera vez que juegas, supera tu record";
+    }
+    console.log({recordTime, playerTime});
+}
+
+function showTime() {
+    spanTime.innerHTML = (Date.now() - timeStart)/1000;
+}
+
+function showRecord() {
+    spanRecord.innerHTML = localStorage.getItem("record_time");
 }
 
     window.addEventListener("keydown", moveByKeys);
